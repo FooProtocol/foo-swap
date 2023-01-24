@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import '@openzeppelin/contracts/utils/math/Math.sol';
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -10,7 +9,7 @@ import './interfaces/IFooswapCallee.sol';
 
 
 contract FooswapPair is ERC20Permit("FooSwap") {
-      constructor() ERC20("Fooswap", "FOO") {
+    constructor() ERC20("Fooswap", "FOO") {
         factory = msg.sender;
     }
     using SafeMath  for uint;
@@ -19,7 +18,7 @@ contract FooswapPair is ERC20Permit("FooSwap") {
 
 
     uint public constant MINIMUM_LIQUIDITY = 10**3;
-    bytes4 private constant SELECTOR = bytes4(keccak256(bytes('transfer(address,uint256)')));
+    bytes4 private constant SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
 
     address public factory;
     address public token0;
@@ -35,7 +34,7 @@ contract FooswapPair is ERC20Permit("FooSwap") {
 
     uint private unlocked = 1;
     modifier lock() {
-        require(unlocked == 1, 'Fooswap: LOCKED');
+        require(unlocked == 1, "Fooswap: LOCKED");
         unlocked = 0;
         _;
         unlocked = 1;
@@ -49,7 +48,7 @@ contract FooswapPair is ERC20Permit("FooSwap") {
 
     function _safeTransfer(address token, address to, uint value) private {
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(SELECTOR, to, value));
-        require(success && (data.length == 0 || abi.decode(data, (bool))), 'Fooswap: TRANSFER_FAILED');
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "Fooswap: TRANSFER_FAILED");
     }
 
     event Mint(address indexed sender, uint amount0, uint amount1);
@@ -66,7 +65,7 @@ contract FooswapPair is ERC20Permit("FooSwap") {
 
     // called once by the factory at time of deployment
     function initialize(address _token0, address _token1) external {
-        require(msg.sender == factory, 'Fooswap: FORBIDDEN'); // sufficient check
+        require(msg.sender == factory, "Fooswap: FORBIDDEN"); // sufficient check
         token0 = _token0;
         token1 = _token1;
     }
@@ -92,13 +91,13 @@ contract FooswapPair is ERC20Permit("FooSwap") {
         address feeTo = IFooswapFactory(factory).feeTo();
         feeOn = feeTo != address(0);
         uint _kLast = kLast; // gas savings
-        uint TotalSupply = totalSupply(); 
+        uint _totalSupply = totalSupply();
         if (feeOn) {
             if (_kLast != 0) {
                 uint rootK = Math.sqrt(uint(_reserve0).mul(_reserve1));
                 uint rootKLast = Math.sqrt(_kLast);
                 if (rootK > rootKLast) {
-                    uint numerator = TotalSupply.mul(rootK.sub(rootKLast));
+                    uint numerator = _totalSupply.mul(rootK.sub(rootKLast));
                     uint denominator = rootK.mul(5).add(rootKLast);
                     uint liquidity = numerator / denominator;
                     if (liquidity > 0) _mint(feeTo, liquidity);
@@ -118,14 +117,14 @@ contract FooswapPair is ERC20Permit("FooSwap") {
         uint amount1 = balance1.sub(_reserve1);
 
         bool feeOn = _mintFee(_reserve0, _reserve1);
-        uint _TotalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
-        if (_TotalSupply == 0) {
+        uint _totalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
+        if (_totalSupply == 0) {
             liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
-           _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
+            _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
         } else {
-            liquidity = Math.min(amount0.mul(_TotalSupply) / _reserve0, amount1.mul(_TotalSupply) / _reserve1);
+            liquidity = Math.min(amount0.mul(_totalSupply) / _reserve0, amount1.mul(_totalSupply) / _reserve1);
         }
-        require(liquidity > 0, 'Fooswap: INSUFFICIENT_LIQUIDITY_MINTED');
+        require(liquidity > 0, "Fooswap: INSUFFICIENT_LIQUIDITY_MINTED");
         _mint(to, liquidity);
 
         _update(balance0, balance1, _reserve0, _reserve1);
@@ -143,10 +142,10 @@ contract FooswapPair is ERC20Permit("FooSwap") {
         uint liquidity = balanceOf(address(this));
 
         bool feeOn = _mintFee(_reserve0, _reserve1);
-        uint _TotalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
-        amount0 = liquidity.mul(balance0) / _TotalSupply; // using balances ensures pro-rata distribution
-        amount1 = liquidity.mul(balance1) / _TotalSupply; // using balances ensures pro-rata distribution
-        require(amount0 > 0 && amount1 > 0, 'Fooswap: INSUFFICIENT_LIQUIDITY_BURNED');
+        uint _totalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
+        amount0 = liquidity.mul(balance0) / _totalSupply; // using balances ensures pro-rata distribution
+        amount1 = liquidity.mul(balance1) / _totalSupply; // using balances ensures pro-rata distribution
+        require(amount0 > 0 && amount1 > 0, "Fooswap: INSUFFICIENT_LIQUIDITY_BURNED");
         _burn(address(this), liquidity);
         _safeTransfer(_token0, to, amount0);
         _safeTransfer(_token1, to, amount1);
@@ -160,16 +159,16 @@ contract FooswapPair is ERC20Permit("FooSwap") {
 
     // this low-level function should be called from a contract which performs important safety checks
     function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external lock {
-        require(amount0Out > 0 || amount1Out > 0, 'Fooswap: INSUFFICIENT_OUTPUT_AMOUNT');
+        require(amount0Out > 0 || amount1Out > 0, "Fooswap: INSUFFICIENT_OUTPUT_AMOUNT");
         (uint112 _reserve0, uint112 _reserve1,) = getReserves(); // gas savings
-        require(amount0Out < _reserve0 && amount1Out < _reserve1, 'Fooswap: INSUFFICIENT_LIQUIDITY');
+        require(amount0Out < _reserve0 && amount1Out < _reserve1, "Fooswap: INSUFFICIENT_LIQUIDITY");
 
         uint balance0;
         uint balance1;
         { // scope for _token{0,1}, avoids stack too deep errors
         address _token0 = token0;
         address _token1 = token1;
-        require(to != _token0 && to != _token1, 'Fooswap: INVALID_TO');
+        require(to != _token0 && to != _token1, "Fooswap: INVALID_TO");
         if (amount0Out > 0) _safeTransfer(_token0, to, amount0Out); // optimistically transfer tokens
         if (amount1Out > 0) _safeTransfer(_token1, to, amount1Out); // optimistically transfer tokens
         if (data.length > 0) IFooswapCallee(to).fooswapCall(msg.sender, amount0Out, amount1Out, data);
@@ -178,11 +177,11 @@ contract FooswapPair is ERC20Permit("FooSwap") {
         }
         uint amount0In = balance0 > _reserve0 - amount0Out ? balance0 - (_reserve0 - amount0Out) : 0;
         uint amount1In = balance1 > _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : 0;
-        require(amount0In > 0 || amount1In > 0, 'Fooswap: INSUFFICIENT_INPUT_AMOUNT');
+        require(amount0In > 0 || amount1In > 0, "Fooswap: INSUFFICIENT_INPUT_AMOUNT");
         { // scope for reserve{0,1}Adjusted, avoids stack too deep errors
         uint balance0Adjusted = balance0.mul(1000).sub(amount0In.mul(2));
         uint balance1Adjusted = balance1.mul(1000).sub(amount1In.mul(2));
-        require(balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(1000**2), 'Fooswap: K');
+        require(balance0Adjusted.mul(balance1Adjusted) >= uint(_reserve0).mul(_reserve1).mul(1000**2), "Fooswap: K");
         }
 
         _update(balance0, balance1, _reserve0, _reserve1);
