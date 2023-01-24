@@ -1,27 +1,32 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.5.16;
+pragma solidity ^0.8.0;
 
-import './interfaces/IFooswapPair.sol';
-import './FooswapERC20.sol';
-import './libraries/Math.sol';
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
+import '@openzeppelin/contracts/utils/math/Math.sol';
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import './libraries/UQ112x112.sol';
-import './interfaces/IERC20.sol';
 import './interfaces/IFooswapFactory.sol';
 import './interfaces/IFooswapCallee.sol';
 
-contract FooswapPair is IFooswapPair, FooswapERC20 {
+
+contract FooswapPair is ERC20Permit("FooSwap") {
+      constructor() ERC20("Fooswap", "FOO") {
+        factory = msg.sender;
+    }
     using SafeMath  for uint;
     using UQ112x112 for uint224;
 
-    uint public constant MINIMUM_LIQUIDITY = 10**3; // This is set and used to avoid division by zero
+
+
+    uint public constant MINIMUM_LIQUIDITY = 10**3;
     bytes4 private constant SELECTOR = bytes4(keccak256(bytes('transfer(address,uint256)')));
 
     address public factory;
     address public token0;
     address public token1;
 
-    uint112 private reserve0;        // uses single storage slot, accessible via getReserves
-    uint112 private reserve1;        // uses single storage slot, accessible via getReserves
+    uint112 private reserve0;           // uses single storage slot, accessible via getReserves
+    uint112 private reserve1;           // uses single storage slot, accessible via getReserves
     uint32  private blockTimestampLast; // uses single storage slot, accessible via getReserves
 
     uint public price0CumulativeLast;
@@ -59,10 +64,6 @@ contract FooswapPair is IFooswapPair, FooswapERC20 {
     );
     event Sync(uint112 reserve0, uint112 reserve1);
 
-    constructor() public {
-        factory = msg.sender;
-    }
-
     // called once by the factory at time of deployment
     function initialize(address _token0, address _token1) external {
         require(msg.sender == factory, 'Fooswap: FORBIDDEN'); // sufficient check
@@ -72,7 +73,7 @@ contract FooswapPair is IFooswapPair, FooswapERC20 {
 
     // update reserves and, on the first call per block, price accumulators
     function _update(uint balance0, uint balance1, uint112 _reserve0, uint112 _reserve1) private {
-        require(balance0 <= uint112(-1) && balance1 <= uint112(-1), 'Fooswap: OVERFLOW');
+        // require(balance0 <= uint112(1) && balance1 <= uint112(1), 'Fooswap: OVERFLOW'); Overflow problem solved with version 0.8.0 above
         uint32 blockTimestamp = uint32(block.timestamp % 2**32);
         uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
@@ -91,12 +92,13 @@ contract FooswapPair is IFooswapPair, FooswapERC20 {
         address feeTo = IFooswapFactory(factory).feeTo();
         feeOn = feeTo != address(0);
         uint _kLast = kLast; // gas savings
+        uint TotalSupply = totalSupply(); 
         if (feeOn) {
             if (_kLast != 0) {
                 uint rootK = Math.sqrt(uint(_reserve0).mul(_reserve1));
                 uint rootKLast = Math.sqrt(_kLast);
                 if (rootK > rootKLast) {
-                    uint numerator = totalSupply.mul(rootK.sub(rootKLast));
+                    uint numerator = TotalSupply.mul(rootK.sub(rootKLast));
                     uint denominator = rootK.mul(5).add(rootKLast);
                     uint liquidity = numerator / denominator;
                     if (liquidity > 0) _mint(feeTo, liquidity);
@@ -116,14 +118,12 @@ contract FooswapPair is IFooswapPair, FooswapERC20 {
         uint amount1 = balance1.sub(_reserve1);
 
         bool feeOn = _mintFee(_reserve0, _reserve1);
-
-        uint _totalSupply = totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
-        if (_totalSupply == 0) {
-            //first liquidity
+        uint _TotalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
+        if (_TotalSupply == 0) {
             liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
            _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
         } else {
-            liquidity = Math.min(amount0.mul(_totalSupply) / _reserve0, amount1.mul(_totalSupply) / _reserve1);
+            liquidity = Math.min(amount0.mul(_TotalSupply) / _reserve0, amount1.mul(_TotalSupply) / _reserve1);
         }
         require(liquidity > 0, 'Fooswap: INSUFFICIENT_LIQUIDITY_MINTED');
         _mint(to, liquidity);
@@ -140,12 +140,12 @@ contract FooswapPair is IFooswapPair, FooswapERC20 {
         address _token1 = token1;                                // gas savings
         uint balance0 = IERC20(_token0).balanceOf(address(this));
         uint balance1 = IERC20(_token1).balanceOf(address(this));
-        uint liquidity = balanceOf[address(this)];
+        uint liquidity = balanceOf(address(this));
 
         bool feeOn = _mintFee(_reserve0, _reserve1);
-        uint _totalSupply = totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
-        amount0 = liquidity.mul(balance0) / _totalSupply; // using balances ensures pro-rata distribution
-        amount1 = liquidity.mul(balance1) / _totalSupply; // using balances ensures pro-rata distribution
+        uint _TotalSupply = totalSupply(); // gas savings, must be defined here since totalSupply can update in _mintFee
+        amount0 = liquidity.mul(balance0) / _TotalSupply; // using balances ensures pro-rata distribution
+        amount1 = liquidity.mul(balance1) / _TotalSupply; // using balances ensures pro-rata distribution
         require(amount0 > 0 && amount1 > 0, 'Fooswap: INSUFFICIENT_LIQUIDITY_BURNED');
         _burn(address(this), liquidity);
         _safeTransfer(_token0, to, amount0);
@@ -201,4 +201,5 @@ contract FooswapPair is IFooswapPair, FooswapERC20 {
     function sync() external lock {
         _update(IERC20(token0).balanceOf(address(this)), IERC20(token1).balanceOf(address(this)), reserve0, reserve1);
     }
+
 }

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.5.16;
+pragma solidity ^0.8.0;
 
 import './interfaces/IFooswapERC20.sol';
-import './libraries/SafeMath.sol';
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract FooswapERC20 is IFooswapERC20 {
     using SafeMath for uint;
