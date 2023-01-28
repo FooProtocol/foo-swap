@@ -8,9 +8,9 @@ import './interfaces/IFooswapRouter01.sol';
 import './interfaces/IERC20.sol';
 import './interfaces/IWETH.sol';
 
-contract FooswapRouter01 is IFooswapRouter01 {
-    address public immutable override factory;
-    address public immutable override WETH;
+contract FooswapRouter01  is IFooswapRouter01{
+    address public immutable override  factory;
+    address public immutable override  WETH;
 
     modifier ensure(uint deadline) {
         require(deadline >= block.timestamp, 'FooswapRouter: EXPIRED');
@@ -64,7 +64,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
         uint amountBMin,
         address to,
         uint deadline
-    ) external override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {
+    ) external  override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {
         (amountA, amountB) = _addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin);
         address pair = FooswapLibrary.pairFor(factory, tokenA, tokenB);
         TransferHelper.safeTransferFrom(tokenA, msg.sender, pair, amountA);
@@ -78,7 +78,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
         uint amountETHMin,
         address to,
         uint deadline
-    ) external override payable ensure(deadline) returns (uint amountToken, uint amountETH, uint liquidity) {
+    ) external   override payable ensure(deadline) returns (uint amountToken, uint amountETH, uint liquidity) {
         (amountToken, amountETH) = _addLiquidity(
             token,
             WETH,
@@ -104,7 +104,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
         uint amountBMin,
         address to,
         uint deadline
-    ) public override ensure(deadline) returns (uint amountA, uint amountB) {
+    ) public override  ensure(deadline) returns (uint amountA, uint amountB) {
         address pair = FooswapLibrary.pairFor(factory, tokenA, tokenB);
         IFooswapPair(pair).transferFrom(msg.sender, pair, liquidity); // send liquidity to pair
         (uint amount0, uint amount1) = IFooswapPair(pair).burn(to);
@@ -120,7 +120,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
         uint amountETHMin,
         address to,
         uint deadline
-    ) public override ensure(deadline) returns (uint amountToken, uint amountETH) {
+    ) public  override ensure(deadline) returns (uint amountToken, uint amountETH) {
         (amountToken, amountETH) = removeLiquidity(
             token,
             WETH,
@@ -143,7 +143,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
         address to,
         uint deadline,
         bool approveMax, uint8 v, bytes32 r, bytes32 s
-    ) external override returns (uint amountA, uint amountB) {
+    ) external override  returns (uint amountA, uint amountB) {
         address pair = FooswapLibrary.pairFor(factory, tokenA, tokenB);
         uint value = approveMax ? type(uint256).max : liquidity;
         IFooswapPair(pair).permit(msg.sender, address(this), value, deadline, v, r, s);
@@ -157,7 +157,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
         address to,
         uint deadline,
         bool approveMax, uint8 v, bytes32 r, bytes32 s
-    ) external override returns (uint amountToken, uint amountETH) {
+    ) external override  returns (uint amountToken, uint amountETH) {
         address pair = FooswapLibrary.pairFor(factory, token, WETH);
         uint value = approveMax ? type(uint256).max : liquidity;
         IFooswapPair(pair).permit(msg.sender, address(this), value, deadline, v, r, s);
@@ -182,7 +182,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
         address[] calldata path,
         address to,
         uint deadline
-    ) external override ensure(deadline) returns (uint[] memory amounts) {
+    ) external  override ensure(deadline) returns (uint[] memory amounts) {
         amounts = FooswapLibrary.getAmountsOut(factory, amountIn, path);
         require(amounts[amounts.length - 1] >= amountOutMin, 'FooswapRouter: INSUFFICIENT_OUTPUT_AMOUNT');
         TransferHelper.safeTransferFrom(path[0], msg.sender, FooswapLibrary.pairFor(factory, path[0], path[1]), amounts[0]);
@@ -194,7 +194,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
         address[] calldata path,
         address to,
         uint deadline
-    ) external override ensure(deadline) returns (uint[] memory amounts) {
+    ) external override  ensure(deadline) returns (uint[] memory amounts) {
         amounts = FooswapLibrary.getAmountsIn(factory, amountOut, path);
         require(amounts[0] <= amountInMax, 'FooswapRouter: EXCESSIVE_INPUT_AMOUNT');
         TransferHelper.safeTransferFrom(path[0], msg.sender, FooswapLibrary.pairFor(factory, path[0], path[1]), amounts[0]);
@@ -202,7 +202,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
     }
     function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
         external
-        override
+         override
         payable
         ensure(deadline)
         returns (uint[] memory amounts)
@@ -216,7 +216,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
     }
     function swapTokensForExactETH(uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
         external
-        override
+         override
         ensure(deadline)
         returns (uint[] memory amounts)
     {
@@ -230,7 +230,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
     }
     function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
         external
-        override
+         override
         ensure(deadline)
         returns (uint[] memory amounts)
     {
@@ -244,7 +244,7 @@ contract FooswapRouter01 is IFooswapRouter01 {
     }
     function swapETHForExactTokens(uint amountOut, address[] calldata path, address to, uint deadline)
         external
-        override
+         override
         payable
         ensure(deadline)
         returns (uint[] memory amounts)
@@ -258,23 +258,23 @@ contract FooswapRouter01 is IFooswapRouter01 {
         if (msg.value > amounts[0]) TransferHelper.safeTransferETH(msg.sender, msg.value - amounts[0]); // refund dust eth, if any
     }
 
-    function quote(uint amountA, uint reserveA, uint reserveB) public pure override returns (uint amountB) {
+    function quote(uint amountA, uint reserveA, uint reserveB) public pure override  returns (uint amountB) {
         return FooswapLibrary.quote(amountA, reserveA, reserveB);
     }
 
-    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) public pure override returns (uint amountOut) {
+    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) public pure  override returns (uint amountOut) {
         return FooswapLibrary.getAmountOut(amountIn, reserveIn, reserveOut);
     }
 
-    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) public pure override returns (uint amountIn) {
+    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) public pure override  returns (uint amountIn) {
         return FooswapLibrary.getAmountOut(amountOut, reserveIn, reserveOut);
     }
 
-    function getAmountsOut(uint amountIn, address[] memory path) public view override returns (uint[] memory amounts) {
+    function getAmountsOut(uint amountIn, address[] memory path) public view  override returns (uint[] memory amounts) {
         return FooswapLibrary.getAmountsOut(factory, amountIn, path);
     }
 
-    function getAmountsIn(uint amountOut, address[] memory path) public view override returns (uint[] memory amounts) {
+    function getAmountsIn(uint amountOut, address[] memory path) public view  override returns (uint[] memory amounts) {
         return FooswapLibrary.getAmountsIn(factory, amountOut, path);
     }
 }

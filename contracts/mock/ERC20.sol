@@ -1,9 +1,9 @@
-pragma solidity =0.5.16;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import '../FooswapERC20.sol';
-
-contract ERC20 is FooswapERC20 {
-    constructor(uint _totalSupply) public {
-        _mint(msg.sender, _totalSupply);
-    }
-}
+// contract ERC20  {
+//     constructor(uint _totalSupply) public {
+//         _mint(msg.sender, _totalSupply);
+//     }
+// }
