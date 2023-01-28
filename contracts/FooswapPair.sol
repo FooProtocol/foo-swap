@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import '@openzeppelin/contracts/utils/math/Math.sol';
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./interfaces/IFooswapPair.sol";
 import './libraries/UQ112x112.sol';
 import './interfaces/IFooswapFactory.sol';
 import './interfaces/IFooswapCallee.sol';
@@ -72,7 +73,7 @@ contract FooswapPair is ERC20Permit("FooSwap") {
 
     // update reserves and, on the first call per block, price accumulators
     function _update(uint balance0, uint balance1, uint112 _reserve0, uint112 _reserve1) private {
-        // require(balance0 <= uint112(1) && balance1 <= uint112(1), 'Fooswap: OVERFLOW'); Overflow problem solved with version 0.8.0 above
+        require(balance0 <= type(uint112).max && balance1 <= type(uint112).max, 'Fooswap: OVERFLOW');
         uint32 blockTimestamp = uint32(block.timestamp % 2**32);
         uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {

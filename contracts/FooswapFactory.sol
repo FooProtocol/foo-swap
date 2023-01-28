@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import './interfaces/IFooswapFactory.sol';
 import './FooswapPair.sol';
 
-contract FooswapFactory is IFooswapFactory {
+contract FooswapFactory  {
     address public feeTo;
     address public feeToSetter;
 
@@ -13,11 +13,11 @@ contract FooswapFactory is IFooswapFactory {
 
     event PairCreated(address indexed token0, address indexed token1, address pair, uint);
 
-    constructor(address _feeToSetter) public {
+    constructor(address _feeToSetter) {
         feeToSetter = _feeToSetter;
     }
 
-    function allPairsLength() external view returns (uint) {
+    function allPairsLength() external  view returns (uint) {
         return allPairs.length;
     }
 
