@@ -1,5 +1,9 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import { any } from "hardhat/internal/core/params/argumentTypes";
+require("dotenv").config()
+// const PRIVATE_KEY: any = process.env.PRIVATE_KEY
+type HttpNetworkAccountsUserConfig = any;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -50,7 +54,16 @@ const config: HardhatUserConfig = {
         },
       },
     ],
-  }
+  },
+  defaultNetwork: "hyperspace",
+  networks: {
+    hyperspace: {
+          url: "https://filecoin-hyperspace.chainstacklabs.com/rpc/v1",
+          accounts:[ process.env.PRIVATE_KEY] as HttpNetworkAccountsUserConfig | undefined ,
+          chainId: 3141,
+      },
+  },
+
 };
 
 export default config;

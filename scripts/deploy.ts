@@ -2,6 +2,14 @@ import { ethers } from "hardhat";
 
 async function main() {
   
+
+  // Deploying WFIL
+  console.log("***********Deploying WFIL*************")
+  const WFIL = await ethers.getContractFactory("WFIL");
+  const wFIL = await WFIL.deploy();
+  await wFIL.deployed();
+  console.log(`WFIL has been deployed to ${wFIL.address}`);
+
   // Deploying FooswapFactory 
   const feesetterAddress = "0x85f20a6924A61904AB44243C7e2c771B3bE46734"
   console.log("***********Deploying FoowapFactory*************")
@@ -11,19 +19,18 @@ async function main() {
   console.log(`FosowapFactory has been deployed to ${fooswapFactory.address}`);
 
   // Deploying FoowswapRouter1
-  const WETHAddress = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
   console.log("***********Deploying FooswapRouter01*************")
   const FooswapRouter01 = await ethers.getContractFactory("FooswapRouter01")
-  const fooswapRouter01 = await FooswapRouter01.deploy(fooswapFactory.address, WETHAddress)
+  const fooswapRouter01 = await FooswapRouter01.deploy(fooswapFactory.address, wFIL.address)
   await fooswapRouter01.deployed()
-  console.log(`FoowsapFactory has been deployed to ${fooswapRouter01.address}`)
+  console.log(`FooswapRouter01 has been deployed to ${fooswapRouter01.address}`)
 
   // Deploying FoowswapRouter2
   console.log("***********Deploying FooswapRouter02*************")
   const FooswapRouter02 = await ethers.getContractFactory("FooswapRouter02")
-  const fooswapRouter02 = await FooswapRouter02.deploy(fooswapFactory.address, WETHAddress)
-  await fooswapRouter01.deployed()
-  console.log(`FoowsapFactory has been deployed to ${fooswapRouter02.address}`)
+  const fooswapRouter02 = await FooswapRouter02.deploy(fooswapFactory.address, wFIL.address)
+  await fooswapRouter02.deployed()
+  console.log(`fooswapRouter02 has been deployed to ${fooswapRouter02.address}`)
 
 }
 
