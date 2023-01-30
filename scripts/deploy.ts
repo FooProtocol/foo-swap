@@ -1,18 +1,30 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  
+  // Deploying FooswapFactory 
+  const feesetterAddress = "0x85f20a6924A61904AB44243C7e2c771B3bE46734"
+  console.log("***********Deploying FoowapFactory*************")
+  const FooswapFactory = await ethers.getContractFactory("FooswapFactory");
+  const fooswapFactory = await FooswapFactory.deploy(feesetterAddress);
+  await fooswapFactory.deployed();
+  console.log(`FosowapFactory has been deployed to ${fooswapFactory.address}`);
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  // Deploying FoowswapRouter1
+  const WETHAddress = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+  console.log("***********Deploying FooswapRouter01*************")
+  const FooswapRouter01 = await ethers.getContractFactory("FooswapRouter01")
+  const fooswapRouter01 = await FooswapRouter01.deploy(fooswapFactory.address, WETHAddress)
+  await fooswapRouter01.deployed()
+  console.log(`FoowsapFactory has been deployed to ${fooswapRouter01.address}`)
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  // Deploying FoowswapRouter2
+  console.log("***********Deploying FooswapRouter02*************")
+  const FooswapRouter02 = await ethers.getContractFactory("FooswapRouter02")
+  const fooswapRouter02 = await FooswapRouter02.deploy(fooswapFactory.address, WETHAddress)
+  await fooswapRouter01.deployed()
+  console.log(`FoowsapFactory has been deployed to ${fooswapRouter02.address}`)
 
-  await lock.deployed();
-
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
