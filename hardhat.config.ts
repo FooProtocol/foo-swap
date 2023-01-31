@@ -58,12 +58,17 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hyperspace",
   networks: {
     hyperspace: {
-          url: "https://filecoin-hyperspace.chainstacklabs.com/rpc/v1",
+          url: "https://matic-mumbai.chainstacklabs.com",
           accounts:[ process.env.PRIVATE_KEY] as HttpNetworkAccountsUserConfig | undefined ,
-          chainId: 3141,
       },
   },
 
+  //   networks: {
+  //   mumbai: {
+  //         url: "https://matic-mumbai.chainstacklabs.com",
+  //         accounts:[ process.env.PRIVATE_KEY] as HttpNetworkAccountsUserConfig | undefined ,
+  //     },
+  // },
 };
 
 export default config;
