@@ -1,5 +1,9 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import { any } from "hardhat/internal/core/params/argumentTypes";
+require("dotenv").config()
+// const PRIVATE_KEY: any = process.env.PRIVATE_KEY
+type HttpNetworkAccountsUserConfig = any;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -50,7 +54,21 @@ const config: HardhatUserConfig = {
         },
       },
     ],
-  }
+  },
+  defaultNetwork: "hyperspace",
+  networks: {
+    hyperspace: {
+          url: "https://matic-mumbai.chainstacklabs.com",
+          accounts:[ process.env.PRIVATE_KEY] as HttpNetworkAccountsUserConfig | undefined ,
+      },
+  },
+
+  //   networks: {
+  //   mumbai: {
+  //         url: "https://matic-mumbai.chainstacklabs.com",
+  //         accounts:[ process.env.PRIVATE_KEY] as HttpNetworkAccountsUserConfig | undefined ,
+  //     },
+  // },
 };
 
 export default config;
