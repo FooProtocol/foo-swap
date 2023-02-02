@@ -55,13 +55,13 @@ const config: HardhatUserConfig = {
       },
     ],
   },
-  defaultNetwork: "hyperspace",
-  networks: {
-    hyperspace: {
-          url: "https://matic-mumbai.chainstacklabs.com",
-          accounts:[ process.env.PRIVATE_KEY] as HttpNetworkAccountsUserConfig | undefined ,
-      },
-  },
+  // defaultNetwork: "hyperspace",
+  // networks: {
+  //   hyperspace: {
+  //     url: "https://matic-mumbai.chainstacklabs.com",
+  //     accounts:[ process.env.PRIVATE_KEY] as HttpNetworkAccountsUserConfig | undefined ,
+  //   },
+  // },
 
   //   networks: {
   //   mumbai: {
