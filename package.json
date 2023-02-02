@@ -1,7 +1,7 @@
 {
   "name": "@fooswap-libs/foo-swap-core",
   "version": "1.0.0",
-  "description": "",
+  "description": "This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,5 +17,16 @@
     "@openzeppelin/contracts": "^4.8.1",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FooProtocol/foo-swap.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FooProtocol/foo-swap/issues"
+  },
+  "homepage": "https://github.com/FooProtocol/foo-swap#readme"
 }
