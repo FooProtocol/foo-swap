@@ -1,6 +1,6 @@
 {
   "name": "@fooswap-libs/foo-swap-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.",
   "main": "index.js",
   "scripts": {
