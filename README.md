@@ -1,13 +1,9 @@
-# Sample Hardhat Project
+# Links to other repos:
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+## [Frontend](https://github.com/FooProtocol/foo-swap-frontend)
+## [Bridge](https://github.com/FooProtocol/foo-bridge-contracts)
+## [Node](https://github.com/FooProtocol/foo-bridge-node)
+## [UI Kit](https://github.com/FooProtocol/foo-uikit)
+## [SDK](https://github.com/FooProtocol/foo-swap-sdk)
 
-Try running some of the following tasks:
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
